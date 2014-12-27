@@ -27,14 +27,17 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 toastText += "Příchozí hovor\n" +
                         "Číslo: " + number;
                 Log.d(LOG_TAG + "_z", "RINGING");
+                context.startService(new Intent(context, PositionTrackService.class));
             } else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
                 // Device call state: Off-hook. At least one call exists that is dialing, active, or on hold, and no calls are ringing or waiting.
                 toastText += "Odchozí hovor";
                 Log.d(LOG_TAG + "_z", "OFFHOOK");
+                context.stopService(new Intent(context, PositionTrackService.class));
             } else if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
                 // Device call state: No activity.
                 toastText += "Konec";
                 Log.d(LOG_TAG + "_z", "IDLE");
+                context.stopService(new Intent(context, PositionTrackService.class));
             } else {
                 toastText += "unknown";
                 Log.d(LOG_TAG + "_z", "UNKNOWN");
