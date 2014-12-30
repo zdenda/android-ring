@@ -11,8 +11,6 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.widget.Toast;
 
 public class PositionTrackService extends Service implements SensorEventListener {
 
@@ -23,7 +21,6 @@ public class PositionTrackService extends Service implements SensorEventListener
     private boolean faceDown = false;
     private boolean muted = false;
 
-    private static final String LOG_TAG = "ring_log";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -33,23 +30,28 @@ public class PositionTrackService extends Service implements SensorEventListener
 
     @Override
     public void onCreate() {
-        Toast.makeText(getApplicationContext(), getClass().getName() + ".onCreate()", Toast.LENGTH_SHORT).show();
+        //TODO: watch for multiple calling onCreate
+        MyLog.setContext(getApplicationContext());
+        MyLog.l(getClass().getName() + ".onCreate()");
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         ringerMode = mAudioManager.getRingerMode();
 
+        //TODO: test if isn't already muted
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
+    //TODO: onStartCommand
+
     @Override
     public void onDestroy() {
-        Toast.makeText(getApplicationContext(), getClass().getName() + ".onDestroy()", Toast.LENGTH_SHORT).show();
+        MyLog.l(getClass().getName() + ".onDestroy()");
 
         mSensorManager.unregisterListener(this);
         mAudioManager.setRingerMode(ringerMode);
-        Log.d(LOG_TAG, "RINGER MODE RESTORED");
+        MyLog.l("RINGER MODE RESTORED");
     }
 
     @Override
@@ -89,7 +91,7 @@ public class PositionTrackService extends Service implements SensorEventListener
     private void showNotification() {
 
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        Log.d(LOG_TAG, "SILENT MODE");
+        MyLog.l("SILENT MODE");
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
