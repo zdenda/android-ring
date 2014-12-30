@@ -1,6 +1,7 @@
 package eu.zkkn.android.ring;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -98,6 +99,10 @@ public class PositionTrackService extends Service implements SensorEventListener
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Ring Notification")
                         .setContentText("Device was upside down!");
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        mBuilder.setContentIntent(pendingIntent);
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(1, mBuilder.build());
     }
 }
