@@ -17,7 +17,7 @@ public class PositionTrackService extends Service implements SensorEventListener
 
     private AudioManager mAudioManager;
     private SensorManager mSensorManager;
-    int ringerMode = AudioManager.RINGER_MODE_NORMAL;
+    int mInitialMode = AudioManager.RINGER_MODE_NORMAL;
     private boolean faceUp = false;
     private boolean faceDown = false;
     private boolean muted = false;
@@ -31,28 +31,35 @@ public class PositionTrackService extends Service implements SensorEventListener
 
     @Override
     public void onCreate() {
-        //TODO: watch for multiple calling onCreate
         MyLog.setContext(getApplicationContext());
         MyLog.l(getClass().getName() + ".onCreate()");
 
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        ringerMode = mAudioManager.getRingerMode();
-
-        //TODO: test if isn't already muted
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mInitialMode = mAudioManager.getRingerMode();
+
+        // check if device isn't already in Silent Mode
+        if (mInitialMode != AudioManager.RINGER_MODE_SILENT) {
+            MyLog.l("Accelerometer activated");
+            Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
-    //TODO: onStartCommand
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        MyLog.l(getClass().getName() + ".onStart()");
+        // If killed, don't restart. We don't know when would it be
+        // and if phone was still ringing
+        return START_NOT_STICKY;
+    }
 
     @Override
     public void onDestroy() {
         MyLog.l(getClass().getName() + ".onDestroy()");
 
         mSensorManager.unregisterListener(this);
-        mAudioManager.setRingerMode(ringerMode);
-        MyLog.l("RINGER MODE RESTORED");
+        restoreRingerMode();
     }
 
     @Override
@@ -73,7 +80,7 @@ public class PositionTrackService extends Service implements SensorEventListener
         if (!muted && faceDown && faceUp) {
             muted = true;
             mSensorManager.unregisterListener(this);
-            showNotification();
+            setSilentMode();
         }
     }
 
@@ -89,7 +96,7 @@ public class PositionTrackService extends Service implements SensorEventListener
         return z > 1;
     }
 
-    private void showNotification() {
+    private void setSilentMode() {
 
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         MyLog.l("SILENT MODE");
@@ -104,5 +111,12 @@ public class PositionTrackService extends Service implements SensorEventListener
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         mBuilder.setContentIntent(pendingIntent);
         ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(1, mBuilder.build());
+    }
+
+    private void restoreRingerMode() {
+        if (mInitialMode != mAudioManager.getRingerMode()) {
+            MyLog.l("RINGER MODE RESTORED");
+            mAudioManager.setRingerMode(mInitialMode);
+        }
     }
 }
