@@ -1,22 +1,23 @@
 package eu.zkkn.android.ring;
 
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
 
 public final class MyLog {
 
-    public static boolean enabled = true;
-    public static boolean toast = true;
     public static final String LOG_TAG = "my_log";
+    public static final boolean ENABLED = false;
+    public static boolean toast = false;
 
     private static Context context = null;
 
@@ -25,73 +26,80 @@ public final class MyLog {
     }
 
 
-    public static int t(String msg) {
-        if (context != null) return t(context, msg);
-        return 0;
+    public static void l(String msg) {
+        if (ENABLED) {
+            l(LOG_TAG, msg);
+        }
     }
 
-    public static int t(Context context, String msg) {
-        if (!enabled) return 0;
+    public static void l(String tag, String msg) {
+        if (ENABLED) {
+            if (toast && context != null) toast(msg);
+            else debug(tag, msg);
+        }
+    }
+
+    public static void l(Intent intent) {
+        if (ENABLED) {
+            l(LOG_TAG, intent);
+        }
+    }
+
+    private static void l(String tag, Intent intent) {
+        if (ENABLED) {
+            if (toast && context != null) toast(intent);
+            else debug(tag, intent);
+        }
+    }
+
+    public static void notification(String title, String text) {
+        if (ENABLED) {
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(context)
+                            .setSmallIcon(R.drawable.ic_launcher)
+                            .setContentTitle(title)
+                            .setContentText(text);
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+            mBuilder.setContentIntent(pendingIntent);
+            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
+                    .notify(1, mBuilder.build());
+        }
+    }
+
+
+
+    private static void toast(String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        return msg.length();
     }
 
-    public static int d(String msg) {
-        return log("d", LOG_TAG, msg);
+    private static void toast(Intent intent) {
+        // Log Intent as toast is not implemented, use debug
+        debug(LOG_TAG, intent);
     }
 
-    public static int d(Intent intent) {
-        return log("d", LOG_TAG, intent);
+    private static void debug(String tag, String msg) {
+        if (ENABLED) {
+            Log.d(tag, msg);
+        }
     }
 
-    public static int l(String msg) {
-        if (toast && context != null) return t(msg);
-        return d(msg);
-    }
-
-    private static int log(String logMethodName, String tag, String msg) {
-        if (!enabled) return 0;
-        Method logMethod = getLogMethod(logMethodName);
-        return invoke(logMethod, tag, msg);
-    }
-
-    private static int log(String logMethodName, String tag, Intent intent) {
-        if (!enabled) return 0;
-        int ret = 0;
-        Method logMethod = getLogMethod(logMethodName);
-        ret += invoke(logMethod, tag, intent.toString());
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            Set<String> keys = bundle.keySet();
-            Iterator<String> it = keys.iterator();
-            invoke(logMethod, tag, "Intent Extras {");
-            while (it.hasNext()) {
-                String key = it.next();
-                invoke(logMethod, tag, " " + key + "=" + bundle.get(key) + " ");
+    private static void debug(String tag, Intent intent) {
+        if (ENABLED) {
+            Log.d(tag, intent.toString());
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                Set<String> keys = bundle.keySet();
+                Iterator<String> it = keys.iterator();
+                Log.d(tag, "Intent Extras {");
+                while (it.hasNext()) {
+                    String key = it.next();
+                    Log.d(tag, " " + key + "=" + bundle.get(key) + " ");
+                }
+                Log.d(tag, "}");
             }
-            invoke(logMethod, tag, "}");
         }
-        return ret;
-    }
-
-    private static Method getLogMethod(String methodName) {
-        Method method = null;
-        try {
-            method = Log.class.getMethod(methodName, String.class, String.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return method;
-    }
-
-    private static int invoke(Method logType, String tag, String msg) {
-        int ret = 0;
-        try {
-            return (int) logType.invoke(null, tag, msg);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return ret;
     }
 
 }

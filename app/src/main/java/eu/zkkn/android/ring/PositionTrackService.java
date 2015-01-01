@@ -1,7 +1,5 @@
 package eu.zkkn.android.ring;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 
 public class PositionTrackService extends Service implements SensorEventListener {
 
@@ -97,20 +94,9 @@ public class PositionTrackService extends Service implements SensorEventListener
     }
 
     private void setSilentMode() {
-
         mAudioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+        MyLog.notification("Ring Notification", "Device was upside down!");
         MyLog.l("SILENT MODE");
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Ring Notification")
-                        .setContentText("Device was upside down!");
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        mBuilder.setContentIntent(pendingIntent);
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(1, mBuilder.build());
     }
 
     private void restoreRingerMode() {
