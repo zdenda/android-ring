@@ -1,9 +1,12 @@
 package eu.zkkn.android.ring;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,10 +27,15 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean enable = preferences.getBoolean(PREF_KEY_ENABLED, true);
+        boolean enabled = preferences.getBoolean(PREF_KEY_ENABLED, true);
+
+        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        boolean hasAccelerometer = (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
+        // TODO: unregister phone state receiver if there's no accelerometer
 
         CheckBox checkBox = (CheckBox) findViewById(R.id.chkEnabled);
-        checkBox.setChecked(enable);
+        checkBox.setEnabled(hasAccelerometer);
+        checkBox.setChecked(enabled && hasAccelerometer);
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
