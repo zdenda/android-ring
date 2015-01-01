@@ -1,26 +1,46 @@
 package eu.zkkn.android.ring;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    public static final String PREF_KEY_ENABLED = "pref_enabled";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ((Button) findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean enable = preferences.getBoolean(PREF_KEY_ENABLED, true);
+
+        CheckBox checkBox = (CheckBox) findViewById(R.id.chkEnabled);
+        checkBox.setChecked(enable);
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                startService(new Intent(MainActivity.this, PositionTrackService.class));
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // update shared preferences
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putBoolean(PREF_KEY_ENABLED, isChecked);
+                editor.commit();
+                // enable/disable  Phone State Broadcast Receiver
+                int state = isChecked ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                ComponentName phoneStateReceiver = new ComponentName(getApplicationContext(), PhoneStateReceiver.class);
+                PackageManager packageManager = getApplicationContext().getPackageManager();
+                packageManager.setComponentEnabledSetting(phoneStateReceiver, state, PackageManager.DONT_KILL_APP);
             }
         });
     }

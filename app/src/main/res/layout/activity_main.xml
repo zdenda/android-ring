@@ -5,12 +5,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <Button
+    <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Position Tracking Service"
-        android:id="@+id/button"
+        android:text="@string/enabled_description"
+        android:id="@+id/chkEnabled"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:checked="true" />
 </RelativeLayout>
