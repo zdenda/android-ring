@@ -33,7 +33,6 @@ public class MainActivity extends ActionBarActivity {
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         boolean hasAccelerometer = (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
-        // TODO: unregister phone state receiver if there's no accelerometer
 
         CheckBox checkBoxMute = (CheckBox) findViewById(R.id.chkMuteEnabled);
         checkBoxMute.setEnabled(hasAccelerometer);
