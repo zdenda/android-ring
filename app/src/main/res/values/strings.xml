@@ -4,6 +4,7 @@
     <string name="app_name">Ring</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_created">Created with love by zdenda</string>
-    <string name="enabled_description">Silence ringtone when screen is flipped down</string>
+    <string name="mute_checkbox_description">Silence ringtone when screen is flipped down</string>
+    <string name="increase_checkbox_description">Gradually turn up the ringtone</string>
 
 </resources>

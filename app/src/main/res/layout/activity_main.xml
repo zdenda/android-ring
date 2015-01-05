@@ -8,9 +8,19 @@
     <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/enabled_description"
-        android:id="@+id/chkEnabled"
+        android:text="@string/mute_checkbox_description"
+        android:id="@+id/chkMuteEnabled"
         android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:checked="false" />
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/increase_checkbox_description"
+        android:id="@+id/chkIncreaseEnabled"
+        android:layout_below="@+id/chkMuteEnabled"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:checked="true" />
