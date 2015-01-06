@@ -33,12 +33,7 @@
         </receiver>
 
         <service
-            android:name=".PositionTrackService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <service
-            android:name=".VolumeService"
+            android:name=".RingingService"
             android:enabled="true"
             android:exported="false" >
         </service>

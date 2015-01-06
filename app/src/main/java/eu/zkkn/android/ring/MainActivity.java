@@ -28,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean mutingEnabled = preferences.getBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, false);
+        boolean mutingEnabled = preferences.getBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, true);
         boolean increasingEnabled = preferences.getBoolean(PREF_KEY_GRADUALLY_INCREASE_ENABLED, true);
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -36,26 +36,31 @@ public class MainActivity extends ActionBarActivity {
 
         CheckBox checkBoxMute = (CheckBox) findViewById(R.id.chkMuteEnabled);
         checkBoxMute.setEnabled(hasAccelerometer);
-        checkBoxMute.setChecked(mutingEnabled && hasAccelerometer && !increasingEnabled);
+        checkBoxMute.setChecked(mutingEnabled && hasAccelerometer);
         CheckBox checkBoxIncrease = (CheckBox) findViewById(R.id.chkIncreaseEnabled);
-        checkBoxIncrease.setChecked(increasingEnabled && !mutingEnabled);
+        checkBoxIncrease.setChecked(increasingEnabled);
 
 
         CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int otherId = R.id.chkMuteEnabled == buttonView.getId() ? R.id.chkIncreaseEnabled : R.id.chkMuteEnabled;
-                if (isChecked) ((CheckBox) findViewById(otherId)).setChecked(false);
+                boolean mute = ((CheckBox) findViewById(R.id.chkMuteEnabled)).isChecked();
+                boolean increase = ((CheckBox) findViewById(R.id.chkIncreaseEnabled)).isChecked();
                 // update shared preferences
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, ((CheckBox) findViewById(R.id.chkMuteEnabled)).isChecked());
-                editor.putBoolean(PREF_KEY_GRADUALLY_INCREASE_ENABLED, ((CheckBox) findViewById(R.id.chkIncreaseEnabled)).isChecked());
+                editor.putBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, mute);
+                editor.putBoolean(PREF_KEY_GRADUALLY_INCREASE_ENABLED, increase);
                 editor.commit();
                 // enable/disable  Phone State Broadcast Receiver
-                int state = isChecked ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                //TODO: what will happen after restart? wil it be enabled again?
+                int state = mute || increase ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
                 ComponentName phoneStateReceiver = new ComponentName(getApplicationContext(), PhoneStateReceiver.class);
                 PackageManager packageManager = getApplicationContext().getPackageManager();
                 packageManager.setComponentEnabledSetting(phoneStateReceiver, state, PackageManager.DONT_KILL_APP);
+                if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+                    MyLog.setContext(getApplicationContext());
+                    MyLog.l("Phone State Receiver Disabled");
+                }
             }
         };
         checkBoxMute.setOnCheckedChangeListener(onCheckedChangeListener);

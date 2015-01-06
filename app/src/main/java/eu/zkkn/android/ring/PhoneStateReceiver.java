@@ -23,12 +23,25 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                 String number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
                 MyLog.l("RINGING; number: " + number);
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-                if (preferences.getBoolean(MainActivity.PREF_KEY_MUTE_ON_FLIP_ENABLED, false)) MyLog.l("Start Mute");
-                if (preferences.getBoolean(MainActivity.PREF_KEY_GRADUALLY_INCREASE_ENABLED, true)) MyLog.l("Start Volume");
+                boolean mute = preferences.getBoolean(MainActivity.PREF_KEY_MUTE_ON_FLIP_ENABLED, true);
+                boolean increase = preferences.getBoolean(MainActivity.PREF_KEY_GRADUALLY_INCREASE_ENABLED, true);
 
-                Class<?> cls = preferences.getBoolean(MainActivity.PREF_KEY_MUTE_ON_FLIP_ENABLED, false) ?
-                        PositionTrackService.class : VolumeService.class;
-                ComponentName componentName = context.startService(new Intent(context, cls));
+                // determine action for intent
+                String action = null;
+                if (mute && increase) {
+                    action = RingingService.ACTION_ALL;
+                } else {
+                    if (mute) action = RingingService.ACTION_MUTE;
+                    if (increase) action = RingingService.ACTION_INCREASE;
+                }
+
+                // start service
+                ComponentName componentName = null;
+                if (action != null) {
+                    Intent i = new Intent(context, RingingService.class);
+                    i.setAction(action);
+                    componentName = context.startService(i);
+                }
                 if (componentName == null) {
                     MyLog.l("Service couldn't be started");
                 }
@@ -43,13 +56,9 @@ public class PhoneStateReceiver extends BroadcastReceiver {
                     MyLog.l("UNKNOWN");
                 }
                 boolean stopped;
-                stopped = context.stopService(new Intent(context, PositionTrackService.class));
+                stopped = context.stopService(new Intent(context, RingingService.class));
                 if (!stopped) {
-                    MyLog.l("PositionTrackService couldn't be stopped");
-                }
-                stopped = context.stopService(new Intent(context, VolumeService.class));
-                if (!stopped) {
-                    MyLog.l("VolumeService couldn't be stopped");
+                    MyLog.l("RingingService couldn't be stopped");
                 }
             }
 
