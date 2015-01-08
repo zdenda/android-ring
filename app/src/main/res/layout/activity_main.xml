@@ -25,12 +25,22 @@
         android:layout_alignParentStart="true"
         android:checked="true" />
 
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sound_notification_checkbox_description"
+        android:id="@+id/chkSoundNotification"
+        android:layout_below="@+id/chkIncreaseEnabled"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:checked="true" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Show Missed Calls"
         android:id="@+id/button"
-        android:layout_below="@+id/chkIncreaseEnabled"
+        android:layout_below="@+id/chkSoundNotification"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

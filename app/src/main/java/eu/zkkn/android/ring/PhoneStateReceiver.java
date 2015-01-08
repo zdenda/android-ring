@@ -91,6 +91,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
     }
 
     private void onMissedCall(Context context) {
+        if (!mPreferences.getBoolean(MainActivity.PREF_KEY_SOUND_NOTIFICATION_ENABLED, true)) return;
         MediaPlayer player = MediaPlayer.create(context, R.raw.beep);
         player.start();
     }
