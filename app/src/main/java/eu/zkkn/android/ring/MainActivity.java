@@ -5,16 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.CallLog;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -65,6 +71,32 @@ public class MainActivity extends ActionBarActivity {
         };
         checkBoxMute.setOnCheckedChangeListener(onCheckedChangeListener);
         checkBoxIncrease.setOnCheckedChangeListener(onCheckedChangeListener);
+
+        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+                //mediaPlayer.start();
+                /*
+                String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER};
+                Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection, CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE, null, null);
+                if (cursor != null) {
+                    int id = cursor.getColumnIndex(CallLog.Calls._ID);
+                    int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
+                    while (cursor.moveToNext()) {
+                        MyLog.l(cursor.getString(id) + " " + cursor.getString(number));
+                    }
+                }
+                */
+                String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
+                String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.DATE};
+                int[] listItems = {android.R.id.text1, android.R.id.text2};
+                Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection, CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE, null, null);
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.simple_list_item_2, cursor, columns, listItems, 0);
+                ((ListView) findViewById(R.id.listView)).setAdapter(adapter);
+            }
+        });
+
     }
 
 

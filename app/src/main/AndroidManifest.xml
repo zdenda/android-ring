@@ -3,6 +3,8 @@
     package="eu.zkkn.android.ring" >
 
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" android:maxSdkVersion="15" />
 
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"

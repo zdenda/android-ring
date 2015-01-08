@@ -16,7 +16,7 @@ import java.util.Set;
 public final class MyLog {
 
     public static final String LOG_TAG = "my_log";
-    public static final boolean ENABLED = false;
+    public static final boolean ENABLED = true;
     public static boolean toast = false;
 
     private static Context context = null;
