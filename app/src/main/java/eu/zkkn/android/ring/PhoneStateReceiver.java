@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 
@@ -18,7 +17,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
     private static final String VAR_KEY_RINGING = "var_phone_state_ringing";
     private static final String VAR_KEY_OFFHOOK = "var_phone_state_offhook";
     private SharedPreferences mPreferences;
-    private SharedPreferences.Editor mPrefEditor;
 
 
     @Override
@@ -27,7 +25,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         MyLog.l(intent);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mPrefEditor = mPreferences.edit();
+        SharedPreferences.Editor mPrefEditor = mPreferences.edit();
 
         if (intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
             String state = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
@@ -92,7 +90,7 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 
     private void onMissedCall(Context context) {
         if (!mPreferences.getBoolean(MainActivity.PREF_KEY_SOUND_NOTIFICATION_ENABLED, true)) return;
-        MediaPlayer player = MediaPlayer.create(context, R.raw.beep);
-        player.start();
+        MyLog.l("Set alarm");
+        NotificationAlarmReceiver.setAlarm(context);
     }
 }

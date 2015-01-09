@@ -83,23 +83,11 @@ public class MainActivity extends ActionBarActivity {
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
-                //mediaPlayer.start();
-                /*
-                String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER};
-                Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection, CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE, null, null);
-                if (cursor != null) {
-                    int id = cursor.getColumnIndex(CallLog.Calls._ID);
-                    int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
-                    while (cursor.moveToNext()) {
-                        MyLog.l(cursor.getString(id) + " " + cursor.getString(number));
-                    }
-                }
-                */
                 String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                 String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                 int[] listItems = {android.R.id.text1, android.R.id.text2};
                 Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection, CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE, null, null);
+                MyLog.l(cursor.getCount() + " missed call(s)");
                 SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.simple_list_item_2, cursor, columns, listItems, 0);
                 ((ListView) findViewById(R.id.listView)).setAdapter(adapter);
             }
