@@ -15,7 +15,14 @@ import java.io.IOException;
 
 public class NotificationService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
-    MediaPlayer mPlayer = null;
+    private MediaPlayer mPlayer = null;
+
+    /** Intent with Wake Lock ID received from
+     * {@link android.support.v4.content.WakefulBroadcastReceiver#startWakefulService(android.content.Context, android.content.Intent)
+     * WakefulBroadcastReceiver.startWakefulService()}, it should be passed back
+     * in order to release the wake lock.
+     */
+    private Intent mWakefullIntent;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -27,8 +34,11 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
     public int onStartCommand(Intent intent, int flags, int startId) {
         MyLog.l(getClass().getName() + ".onStart()");
         MyLog.l(intent);
+        mWakefullIntent = intent;
         if (hasNewMissedCalls()) {
+            MyLog.setContext(this);
             MyLog.l("Beeeep!!!");
+            MyLog.notification("Beeeep!!!", "Missed call");
             playNotificationSound();
         } else {
             MyLog.l("Cancel Alarm");
@@ -40,6 +50,7 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
 
     @Override
     public void onDestroy() {
+        NotificationAlarmReceiver.completeWakefulIntent(mWakefullIntent);
         if (mPlayer != null) {
             mPlayer.release();
             mPlayer = null;
@@ -69,6 +80,7 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
             mPlayer.prepareAsync();
         } catch (IOException e) {
             Log.d("NotificationService", "MediaPlayer failed", e);
+            stopSelf();
         }
     }
 

@@ -34,6 +34,12 @@ public class RingingService extends Service implements SensorEventListener {
     public static final String ACTION_ALL = "eu.zkkn.android.ring.action.ALL";
 
 
+    /** Indicates whether the mute functionality is active */
+    private boolean mMuteStarted;
+
+    /** Indicates whether the increasing of ringer's volume is active */
+    private boolean mIncreaseStarted;
+
     /** Access to volume and ringer mode */
     private AudioManager mAudioManager;
 
@@ -100,24 +106,26 @@ public class RingingService extends Service implements SensorEventListener {
         if (mInitialMode == AudioManager.RINGER_MODE_SILENT) stopSelf();
         MyLog.l(intent.getAction());
 
-        boolean success;
         switch (intent.getAction()) {
             case ACTION_ALL:
-                success = startIncrease();
-                success |= startMute();
+                mIncreaseStarted = startIncrease();
+                mMuteStarted = startMute();
                 break;
             case ACTION_INCREASE:
-                success = startIncrease();
+                mIncreaseStarted = startIncrease();
+                mMuteStarted = false;
                 break;
             case ACTION_MUTE:
-                success = startMute();
+                mIncreaseStarted = false;
+                mMuteStarted = startMute();
                 break;
             default:
-                success = false;
+                mIncreaseStarted = false;
+                mMuteStarted = false;
                 break;
         }
         // stop service if none function was successfully started
-        if (!success) stopSelf();
+        if (!mMuteStarted && !mIncreaseStarted) stopSelf();
 
         // If killed, don't restart. We don't know when would that be
         // and if the phone was still ringing
@@ -129,9 +137,8 @@ public class RingingService extends Service implements SensorEventListener {
     @Override
     public void onDestroy() {
         MyLog.l(getClass().getName() + ".onDestroy()");
-        // TODO: call only if necessary
-        destroyMute();
-        destroyIncrease();
+        if (mMuteStarted) destroyMute();
+        if (mIncreaseStarted) destroyIncrease();
     }
 
     /**
