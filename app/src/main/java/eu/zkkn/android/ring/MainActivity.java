@@ -1,5 +1,6 @@
 package eu.zkkn.android.ring;
 
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -9,9 +10,11 @@ import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CallLog;
+import android.provider.Telephony;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -86,6 +90,14 @@ public class MainActivity extends ActionBarActivity {
         boolean debugEnabled = mPreferences.getBoolean(PREF_KEY_DEBUG_ENABLED, false);
         if (debugEnabled) {
             findViewById(R.id.layoutDebug).setVisibility(View.VISIBLE);
+            refreshSmsCounts();
+
+            findViewById(R.id.btSmsRefresh).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refreshSmsCounts();
+                }
+            });
 
             findViewById(R.id.btMissedCalls).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,7 +146,7 @@ public class MainActivity extends ActionBarActivity {
                 return true;
 
             case R.id.action_enable_debug:
-                boolean debugging = false;
+                boolean debugging;
                 if (item.isChecked()) {
                     debugging = false;
                     item.setChecked(false);
@@ -151,4 +163,18 @@ public class MainActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    // Telephony.Sms is in SDK since KITKAT, but unofficially should work on older versions
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void refreshSmsCounts() {
+        String[] projection = {Telephony.Sms.Inbox._ID};
+        Cursor cursor = getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI,
+                projection, Telephony.Sms.Inbox.SEEN + " = 0", null, null);
+        ((TextView) findViewById(R.id.tvUnseenCount)).setText(" " + cursor.getCount() + " ");
+
+        cursor = getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI,
+                projection, Telephony.Sms.Inbox.READ + " = 0", null, null);
+        ((TextView) findViewById(R.id.tvUnreadCount)).setText(" " + cursor.getCount() + " ");
+    }
+
 }
