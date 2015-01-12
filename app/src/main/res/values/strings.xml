@@ -7,5 +7,6 @@
     <string name="mute_checkbox_description">Silence ringtone when screen is flipped down</string>
     <string name="increase_checkbox_description">Gradually turn up the ringtone</string>
     <string name="sound_notification_checkbox_description">Sound notification for unreceived calls</string>
+    <string name="missed_calls_button">Show Missed Calls</string>
 
 </resources>
