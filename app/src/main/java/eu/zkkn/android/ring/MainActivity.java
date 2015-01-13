@@ -59,6 +59,7 @@ public class MainActivity extends ActionBarActivity {
 
 
         CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+            // TODO: you better rewrite this!!!
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 boolean mute = ((CheckBox) findViewById(R.id.chkMuteEnabled)).isChecked();
@@ -80,6 +81,18 @@ public class MainActivity extends ActionBarActivity {
                 if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
                     MyLog.setContext(getApplicationContext());
                     MyLog.l("Phone State Receiver Disabled");
+                }
+                // enable/disable SMS and MMS receivers
+                if (buttonView.getId() == R.id.chkSoundNotification) {
+                    state = notification ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                    ComponentName smsReceiver = new ComponentName(getApplicationContext(), SmsReceiver.class);
+                    ComponentName mmsReceiver = new ComponentName(getApplicationContext(), MmsReceiver.class);
+                    packageManager.setComponentEnabledSetting(smsReceiver, state, PackageManager.DONT_KILL_APP);
+                    packageManager.setComponentEnabledSetting(mmsReceiver, state, PackageManager.DONT_KILL_APP);
+                    if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+                        MyLog.setContext(getApplicationContext());
+                        MyLog.l("SMS and MMS Receivers Disabled");
+                    }
                 }
             }
         };

@@ -6,7 +6,7 @@
     <string name="action_created">Created with love by zdenda</string>
     <string name="mute_checkbox_description">Silence ringtone when screen is flipped down</string>
     <string name="increase_checkbox_description">Gradually turn up the ringtone</string>
-    <string name="sound_notification_checkbox_description">Sound notification for unreceived calls</string>
+    <string name="sound_notification_checkbox_description">Sound notification for unreceived calls and unread SMS/MMS</string>
     <string name="missed_calls_button">Show Missed Calls</string>
     <string name="sms_textview">SMS:</string>
     <string name="unseen_textview">unseen,</string>

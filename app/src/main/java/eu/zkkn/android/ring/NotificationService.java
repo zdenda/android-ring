@@ -1,13 +1,16 @@
 package eu.zkkn.android.ring;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.CallLog;
+import android.provider.Telephony;
 import android.util.Log;
 
 import java.io.IOException;
@@ -35,7 +38,7 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
         MyLog.l(getClass().getName() + ".onStart()");
         MyLog.l(intent);
         mWakefullIntent = intent;
-        if (hasNewMissedCalls()) {
+        if (hasNewMissedCalls() || hasNewSmsMms()) {
             MyLog.setContext(this);
             MyLog.l("Beeeep!!!");
             MyLog.notification("Beeeep!!!", "Missed call");
@@ -66,6 +69,28 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
         int count = cursor.getCount();
         cursor.close();
         MyLog.l("Missed calls: " + count);
+        return count > 0;
+    }
+
+    // Telephony.Sms Telephony.Mms are part of SDK since KITKAT,
+    // but unofficially should work on older versions
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private boolean hasNewSmsMms() {
+        int count = 0;
+        Cursor cursor;
+
+        //SMS
+        String[] projection = {Telephony.Sms.Inbox._ID};
+        cursor = getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI,
+                projection, Telephony.Sms.Inbox.READ + " = 0", null, null);
+        count += cursor.getCount();
+        //MMS
+        cursor = getContentResolver().query(Telephony.Mms.Inbox.CONTENT_URI,
+                projection, Telephony.Mms.Inbox.READ + " = 0", null, null);
+        count += cursor.getCount();
+
+        cursor.close();
+        MyLog.l("New SMS and MSS: " + count);
         return count > 0;
     }
 
