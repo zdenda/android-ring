@@ -9,8 +9,9 @@
     <string name="sound_notification_checkbox_description">Sound notification for unreceived calls</string>
     <string name="missed_calls_button">Show Missed Calls</string>
     <string name="sms_textview">SMS:</string>
-    <string name="unseen_sms_textview">unseen,</string>
-    <string name="unread_sms_textview">unread</string>
-    <string name="sms_refresh_button">Refresh</string>
+    <string name="unseen_textview">unseen,</string>
+    <string name="unread_textview">unread</string>
+    <string name="refresh_button">Refresh</string>
+    <string name="mms_textview">MMS:</string>
 
 </resources>

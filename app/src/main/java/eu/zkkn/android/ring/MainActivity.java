@@ -91,11 +91,19 @@ public class MainActivity extends ActionBarActivity {
         if (debugEnabled) {
             findViewById(R.id.layoutDebug).setVisibility(View.VISIBLE);
             refreshSmsCounts();
+            refreshMmsCounts();
 
             findViewById(R.id.btSmsRefresh).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     refreshSmsCounts();
+                }
+            });
+
+            findViewById(R.id.btMmsRefresh).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    refreshMmsCounts();
                 }
             });
 
@@ -170,11 +178,28 @@ public class MainActivity extends ActionBarActivity {
         String[] projection = {Telephony.Sms.Inbox._ID};
         Cursor cursor = getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI,
                 projection, Telephony.Sms.Inbox.SEEN + " = 0", null, null);
-        ((TextView) findViewById(R.id.tvUnseenCount)).setText(" " + cursor.getCount() + " ");
+        ((TextView) findViewById(R.id.tvUnseenSmsCount)).setText(" " + cursor.getCount() + " ");
 
         cursor = getContentResolver().query(Telephony.Sms.Inbox.CONTENT_URI,
                 projection, Telephony.Sms.Inbox.READ + " = 0", null, null);
-        ((TextView) findViewById(R.id.tvUnreadCount)).setText(" " + cursor.getCount() + " ");
+        ((TextView) findViewById(R.id.tvUnreadSmsCount)).setText(" " + cursor.getCount() + " ");
+
+        cursor.close();
+    }
+
+    // Telephony.Mms is in SDK since KITKAT, but unofficially should work on older versions
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void refreshMmsCounts() {
+        String[] projection = {Telephony.Mms.Inbox._ID};
+        Cursor cursor = getContentResolver().query(Telephony.Mms.Inbox.CONTENT_URI,
+                projection, Telephony.Mms.Inbox.SEEN + " = 0", null, null);
+        ((TextView) findViewById(R.id.tvUnseenMmsCount)).setText(" " + cursor.getCount() + " ");
+
+        cursor = getContentResolver().query(Telephony.Mms.Inbox.CONTENT_URI,
+                projection, Telephony.Mms.Inbox.READ + " = 0", null, null);
+        ((TextView) findViewById(R.id.tvUnreadMmsCount)).setText(" " + cursor.getCount() + " ");
+
+        cursor.close();
     }
 
 }

@@ -63,8 +63,10 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
         Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection,
                 CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE,
                 null, null);
-        MyLog.l("Missed calls: " + cursor.getCount());
-        return cursor.getCount() > 0;
+        int count = cursor.getCount();
+        cursor.close();
+        MyLog.l("Missed calls: " + count);
+        return count > 0;
     }
 
     private void playNotificationSound() {

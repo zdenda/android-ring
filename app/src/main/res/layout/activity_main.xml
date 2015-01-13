@@ -62,32 +62,77 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text=" 0 "
-                android:id="@+id/tvUnseenCount" />
+                android:id="@+id/tvUnseenSmsCount" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/unseen_sms_textview" />
+                android:text="@string/unseen_textview" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text=" 0 "
-                android:id="@+id/tvUnreadCount" />
+                android:id="@+id/tvUnreadSmsCount" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/unread_sms_textview" />
+                android:text="@string/unread_textview" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sms_refresh_button"
+                android:text="@string/refresh_button"
                 android:id="@+id/btSmsRefresh" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mms_textview"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/tvUnseenMmsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 0 "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unseen_textview"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/tvUnreadMmsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" 0 "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unread_textview"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <Button
+                android:id="@+id/btMmsRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh_button" />
 
         </LinearLayout>
 
@@ -102,6 +147,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/listView"
             android:background="@android:color/darker_gray" />
+
     </LinearLayout>
 
 </RelativeLayout>
