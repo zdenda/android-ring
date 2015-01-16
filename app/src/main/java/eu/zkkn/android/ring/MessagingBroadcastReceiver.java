@@ -3,8 +3,6 @@ package eu.zkkn.android.ring;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 public abstract class MessagingBroadcastReceiver extends BroadcastReceiver {
 
@@ -17,9 +15,7 @@ public abstract class MessagingBroadcastReceiver extends BroadcastReceiver {
 
         mIntent = intent;
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean enabled = preferences.getBoolean(MainActivity.PREF_KEY_SOUND_NOTIFICATION_ENABLED, true);
-
+        boolean enabled = ShPrefUtils.isSoundNotificationEnabled(context);
         if (enabled && checkIntent()) {
             MyLog.l("Set alarm");
             NotificationAlarmReceiver.setAlarm(context);

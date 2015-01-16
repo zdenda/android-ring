@@ -38,6 +38,7 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
         MyLog.l(getClass().getName() + ".onStart()");
         MyLog.l(intent);
         mWakefullIntent = intent;
+        // TODO: try canceling alarm on "android.intent.action.USER_PRESENT"
         if (hasNewMissedCalls() || hasNewSmsMms()) {
             MyLog.setContext(this);
             MyLog.l("Beeeep!!!");

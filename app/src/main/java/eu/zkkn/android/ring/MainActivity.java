@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Sensor;
@@ -12,7 +11,6 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.CallLog;
 import android.provider.Telephony;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -29,22 +27,14 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
-    public static final String PREF_KEY_MUTE_ON_FLIP_ENABLED = "pref_mute_enabled";
-    public static final String PREF_KEY_GRADUALLY_INCREASE_ENABLED = "pref_increase_enabled";
-    public static final String PREF_KEY_SOUND_NOTIFICATION_ENABLED = "pref_notification_enabled";
-    public static final String PREF_KEY_DEBUG_ENABLED = "pref_debug_enabled";
-
-    private SharedPreferences mPreferences;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean mutingEnabled = mPreferences.getBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, true);
-        boolean increasingEnabled = mPreferences.getBoolean(PREF_KEY_GRADUALLY_INCREASE_ENABLED, true);
-        boolean notificationEnabled = mPreferences.getBoolean(PREF_KEY_SOUND_NOTIFICATION_ENABLED, true);
+        boolean mutingEnabled = ShPrefUtils.isMuteEnabled(this);
+        boolean increasingEnabled = ShPrefUtils.isIncreaseEnabled(this);
+        boolean notificationEnabled = ShPrefUtils.isSoundNotificationEnabled(this);
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         boolean hasAccelerometer = (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
@@ -66,11 +56,9 @@ public class MainActivity extends ActionBarActivity {
                 boolean increase = ((CheckBox) findViewById(R.id.chkIncreaseEnabled)).isChecked();
                 boolean notification = ((CheckBox) findViewById(R.id.chkSoundNotification)).isChecked();
                 // update shared preferences
-                SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putBoolean(PREF_KEY_MUTE_ON_FLIP_ENABLED, mute);
-                editor.putBoolean(PREF_KEY_GRADUALLY_INCREASE_ENABLED, increase);
-                editor.putBoolean(PREF_KEY_SOUND_NOTIFICATION_ENABLED, notification);
-                editor.commit();
+                ShPrefUtils.setMuteEnabled(MainActivity.this, mute);
+                ShPrefUtils.setIncreaseEnabled(MainActivity.this, increase);
+                ShPrefUtils.setSoundNotificationEnabled(MainActivity.this, notification);
                 // enable/disable  Phone State Broadcast Receiver
                 //TODO: what will happen after restart? wil it be enabled again?
                 int state = mute || increase || notification
@@ -100,8 +88,7 @@ public class MainActivity extends ActionBarActivity {
         checkBoxIncrease.setOnCheckedChangeListener(onCheckedChangeListener);
         checkBoxNotification.setOnCheckedChangeListener(onCheckedChangeListener);
 
-        boolean debugEnabled = mPreferences.getBoolean(PREF_KEY_DEBUG_ENABLED, false);
-        if (debugEnabled) {
+        if (ShPrefUtils.isDebugEnabled(this)) {
             findViewById(R.id.layoutDebug).setVisibility(View.VISIBLE);
             refreshSmsCounts();
             refreshMmsCounts();
@@ -146,7 +133,7 @@ public class MainActivity extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem debug = menu.findItem(R.id.action_enable_debug);
-        boolean debugEnabled = mPreferences.getBoolean(PREF_KEY_DEBUG_ENABLED, false);
+        boolean debugEnabled = ShPrefUtils.isDebugEnabled(this);
         debug.setChecked(debugEnabled);
 
         return true;
@@ -176,7 +163,7 @@ public class MainActivity extends ActionBarActivity {
                     item.setChecked(true);
                 }
                 // save to preferences
-                mPreferences.edit().putBoolean(PREF_KEY_DEBUG_ENABLED, debugging).commit();
+                ShPrefUtils.setDebugEnabled(this, debugging);
                 Toast.makeText(this, "Changes will take effect after app restart.", Toast.LENGTH_LONG).show();
                 return true;
 
