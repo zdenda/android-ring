@@ -27,67 +27,79 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
+    /**
+     * CheckBox for enable/disable flipping over to mute
+     */
+    private CheckBox mChbMute;
+
+    /**
+     * CheckBox for enable/disable increasing volume of ringtone
+     */
+    private CheckBox mChbIncrease;
+
+    /**
+     * CheckBox for enable/disable beep sound notification for missed calls and unread SMS/MMS
+     */
+    private CheckBox mChbNotification;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        boolean mutingEnabled = ShPrefUtils.isMuteEnabled(this);
-        boolean increasingEnabled = ShPrefUtils.isIncreaseEnabled(this);
-        boolean notificationEnabled = ShPrefUtils.isSoundNotificationEnabled(this);
-
+        // set statuses of checkBoxes
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         boolean hasAccelerometer = (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null);
+        boolean mutingEnabled = ShPrefUtils.isMuteEnabled(this);
+        mChbMute = (CheckBox) findViewById(R.id.chkMuteEnabled);
+        mChbMute.setEnabled(hasAccelerometer); // disable checkbox if there's no Accelerometer
+        mChbMute.setChecked(mutingEnabled && hasAccelerometer);
 
-        CheckBox checkBoxMute = (CheckBox) findViewById(R.id.chkMuteEnabled);
-        checkBoxMute.setEnabled(hasAccelerometer);
-        checkBoxMute.setChecked(mutingEnabled && hasAccelerometer);
-        CheckBox checkBoxIncrease = (CheckBox) findViewById(R.id.chkIncreaseEnabled);
-        checkBoxIncrease.setChecked(increasingEnabled);
-        CheckBox checkBoxNotification = (CheckBox) findViewById(R.id.chkSoundNotification);
-        checkBoxNotification.setChecked(notificationEnabled);
+        mChbIncrease = (CheckBox) findViewById(R.id.chkIncreaseEnabled);
+        mChbIncrease.setChecked(ShPrefUtils.isIncreaseEnabled(this));
+
+        mChbNotification = (CheckBox) findViewById(R.id.chkSoundNotification);
+        mChbNotification.setChecked(ShPrefUtils.isSoundNotificationEnabled(this));
 
 
+        // common changeListener for all checkboxes
         CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
-            // TODO: you better rewrite this!!!
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                boolean mute = ((CheckBox) findViewById(R.id.chkMuteEnabled)).isChecked();
-                boolean increase = ((CheckBox) findViewById(R.id.chkIncreaseEnabled)).isChecked();
-                boolean notification = ((CheckBox) findViewById(R.id.chkSoundNotification)).isChecked();
-                // update shared preferences
-                ShPrefUtils.setMuteEnabled(MainActivity.this, mute);
-                ShPrefUtils.setIncreaseEnabled(MainActivity.this, increase);
-                ShPrefUtils.setSoundNotificationEnabled(MainActivity.this, notification);
+
+                // call on*Changed for appropriate checkBox
+                switch (buttonView.getId()) {
+                    case R.id.chkMuteEnabled:
+                        onMuteChbChanged(isChecked);
+                        break;
+                    case  R.id.chkIncreaseEnabled:
+                        onIncreaseChbChanged(isChecked);
+                        break;
+                    case R.id.chkSoundNotification:
+                        onNotificationChbChanged(isChecked);
+                        break;
+                    default:
+                        MyLog.l("Unknown CheckBox changed");
+                        return;
+                }
+
                 // enable/disable  Phone State Broadcast Receiver
                 //TODO: what will happen after restart? wil it be enabled again?
-                int state = mute || increase || notification
-                        ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                ComponentName phoneStateReceiver = new ComponentName(getApplicationContext(), PhoneStateReceiver.class);
-                PackageManager packageManager = getApplicationContext().getPackageManager();
-                packageManager.setComponentEnabledSetting(phoneStateReceiver, state, PackageManager.DONT_KILL_APP);
-                if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+                boolean enable = mChbMute.isChecked() || mChbIncrease.isChecked() || mChbNotification.isChecked();
+                toggleComponentState(PhoneStateReceiver.class, enable);
+                if (!enable) {
                     MyLog.setContext(getApplicationContext());
                     MyLog.l("Phone State Receiver Disabled");
                 }
-                // enable/disable SMS and MMS receivers
-                if (buttonView.getId() == R.id.chkSoundNotification) {
-                    state = notification ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                    ComponentName smsReceiver = new ComponentName(getApplicationContext(), SmsReceiver.class);
-                    ComponentName mmsReceiver = new ComponentName(getApplicationContext(), MmsReceiver.class);
-                    packageManager.setComponentEnabledSetting(smsReceiver, state, PackageManager.DONT_KILL_APP);
-                    packageManager.setComponentEnabledSetting(mmsReceiver, state, PackageManager.DONT_KILL_APP);
-                    if (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-                        MyLog.setContext(getApplicationContext());
-                        MyLog.l("SMS and MMS Receivers Disabled");
-                    }
-                }
             }
         };
-        checkBoxMute.setOnCheckedChangeListener(onCheckedChangeListener);
-        checkBoxIncrease.setOnCheckedChangeListener(onCheckedChangeListener);
-        checkBoxNotification.setOnCheckedChangeListener(onCheckedChangeListener);
+        mChbMute.setOnCheckedChangeListener(onCheckedChangeListener);
+        mChbIncrease.setOnCheckedChangeListener(onCheckedChangeListener);
+        mChbNotification.setOnCheckedChangeListener(onCheckedChangeListener);
 
+
+        // initialize Debug controls
         if (ShPrefUtils.isDebugEnabled(this)) {
             findViewById(R.id.layoutDebug).setVisibility(View.VISIBLE);
             refreshSmsCounts();
@@ -110,6 +122,7 @@ public class MainActivity extends ActionBarActivity {
             findViewById(R.id.btMissedCalls).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), mChbMute.isChecked() ? "Checked" : "Unchecked", Toast.LENGTH_SHORT).show();
                     String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                     String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                     int[] listItems = {android.R.id.text1, android.R.id.text2};
@@ -125,7 +138,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,11 +176,50 @@ public class MainActivity extends ActionBarActivity {
                 }
                 // save to preferences
                 ShPrefUtils.setDebugEnabled(this, debugging);
+                // TODO: http://developer.android.com/reference/android/app/Activity.html#recreate%28%29
+                // unfortunately it works only API level 11+
                 Toast.makeText(this, "Changes will take effect after app restart.", Toast.LENGTH_LONG).show();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void onMuteChbChanged(boolean isChecked) {
+        ShPrefUtils.setMuteEnabled(this, isChecked);
+    }
+
+    private void onIncreaseChbChanged(boolean isChecked) {
+        ShPrefUtils.setIncreaseEnabled(this, isChecked);
+    }
+
+    private void onNotificationChbChanged(boolean isChecked) {
+        ShPrefUtils.setSoundNotificationEnabled(this, isChecked);
+        // enable/disable SMS and MMS receivers
+        toggleComponentState(SmsReceiver.class, isChecked);
+        toggleComponentState(MmsReceiver.class, isChecked);
+        if (!isChecked) {
+            MyLog.setContext(getApplicationContext());
+            MyLog.l("SMS and MMS Receivers Disabled");
+        }
+    }
+
+    /**
+     * Toggle the enabled settings for a package component (e.g. Receiver)
+     * This will override state which have been set previously or in manifest file.
+     *
+     * @param componentClass The Class object of the desired component
+     * @param enable True for enabling component, false for disabling
+     */
+    private void toggleComponentState(Class<?> componentClass, boolean enable) {
+        int state = enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        ComponentName component = new ComponentName(getApplicationContext(), componentClass);
+        PackageManager packageManager = getApplicationContext().getPackageManager();
+        if (state != packageManager.getComponentEnabledSetting(component)) {
+            packageManager.setComponentEnabledSetting(component, state, PackageManager.DONT_KILL_APP);
+            MyLog.l(component + " state changed to [" + enable + "]");
         }
     }
 
