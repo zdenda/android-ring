@@ -122,7 +122,6 @@ public class MainActivity extends ActionBarActivity {
             findViewById(R.id.btMissedCalls).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(getApplicationContext(), mChbMute.isChecked() ? "Checked" : "Unchecked", Toast.LENGTH_SHORT).show();
                     String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                     String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.DATE};
                     int[] listItems = {android.R.id.text1, android.R.id.text2};
