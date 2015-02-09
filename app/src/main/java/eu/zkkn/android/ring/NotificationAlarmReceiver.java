@@ -9,6 +9,8 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 public class NotificationAlarmReceiver extends WakefulBroadcastReceiver {
 
+    private static final long INTERVAL_FIRST_TRIGGER = 5 * 60 * 1000; // 5 minutes
+
     @Override
     public void onReceive(Context context, Intent intent) {
         MyLog.l("Alarm onReceive()");
@@ -19,7 +21,8 @@ public class NotificationAlarmReceiver extends WakefulBroadcastReceiver {
     public static void setAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + 1000, AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                SystemClock.elapsedRealtime() + INTERVAL_FIRST_TRIGGER,
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 getAlarmIntent(context));
     }
 
