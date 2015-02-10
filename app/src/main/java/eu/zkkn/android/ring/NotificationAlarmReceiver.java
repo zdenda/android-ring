@@ -24,6 +24,10 @@ public class NotificationAlarmReceiver extends WakefulBroadcastReceiver {
                 SystemClock.elapsedRealtime() + INTERVAL_FIRST_TRIGGER,
                 AlarmManager.INTERVAL_FIFTEEN_MINUTES,
                 getAlarmIntent(context));
+        // if enabled, cancel alarm on unlock screen
+        if (ShPrefUtils.isAutoCancelSoundNotification(context)) {
+            UserPresentReceiver.register(context);
+        }
     }
 
     public static void cancelAlarm(Context context) {

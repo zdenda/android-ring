@@ -100,6 +100,16 @@ public class MainActivity extends ActionBarActivity {
 
 
         // initialize Debug controls
+        CheckBox cancelNotification = (CheckBox) findViewById(R.id.chkCancelSoundNotification);
+        cancelNotification.setEnabled(mChbNotification.isChecked());
+        cancelNotification.setChecked(ShPrefUtils.isAutoCancelSoundNotification(this));
+        cancelNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                ShPrefUtils.setAutoCancelSoundNotification(MainActivity.this, isChecked);
+            }
+        });
+
         if (ShPrefUtils.isDebugEnabled(this)) {
             findViewById(R.id.layoutDebug).setVisibility(View.VISIBLE);
             refreshSmsCounts();
@@ -198,9 +208,12 @@ public class MainActivity extends ActionBarActivity {
         // enable/disable SMS and MMS receivers
         toggleComponentState(SmsReceiver.class, isChecked);
         toggleComponentState(MmsReceiver.class, isChecked);
+        CheckBox cancel = (CheckBox) findViewById(R.id.chkCancelSoundNotification);
+        cancel.setEnabled(isChecked);
         if (!isChecked) {
             MyLog.setContext(getApplicationContext());
             MyLog.l("SMS and MMS Receivers Disabled");
+            cancel.setChecked(false);
         }
     }
 

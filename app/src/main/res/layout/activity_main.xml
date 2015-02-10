@@ -46,6 +46,15 @@
         android:focusableInTouchMode="false"
         android:visibility="gone">
 
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:text="@string/cancel_sound_notification_checkbox_description"
+            android:id="@+id/chkCancelSoundNotification"
+            android:checked="false" />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

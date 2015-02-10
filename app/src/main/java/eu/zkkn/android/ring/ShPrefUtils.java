@@ -27,6 +27,12 @@ public class ShPrefUtils {
     public static final String PREF_KEY_SOUND_NOTIFICATION_ENABLED = "pref_notification_enabled";
 
     /**
+     * Boolean preference that indicates whether the Notification sound should be canceled right
+     * after user unlocks the screen
+     */
+    public static final String PREF_KEY_CANCEL_SOUND_NOTIFICATION = "pref_cancel_sound_notification_on_user_present";
+
+    /**
      * Boolean preference that indicates whether some debug information should be presented to the user
      */
     public static final String PREF_KEY_DEBUG_ENABLED = "pref_debug_enabled";
@@ -66,6 +72,15 @@ public class ShPrefUtils {
 
     public static boolean isSoundNotificationEnabled(Context context) {
         return getPref(context).getBoolean(PREF_KEY_SOUND_NOTIFICATION_ENABLED, true);
+    }
+
+
+    public static void setAutoCancelSoundNotification(Context context, boolean enabled) {
+        getPref(context).edit().putBoolean(PREF_KEY_CANCEL_SOUND_NOTIFICATION, enabled).commit();
+    }
+
+    public static boolean isAutoCancelSoundNotification(Context context) {
+        return getPref(context).getBoolean(PREF_KEY_CANCEL_SOUND_NOTIFICATION, false);
     }
 
 

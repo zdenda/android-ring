@@ -13,5 +13,6 @@
     <string name="unread_textview">unread</string>
     <string name="refresh_button">Refresh</string>
     <string name="mms_textview">MMS:</string>
+    <string name="cancel_sound_notification_checkbox_description">Automatically cancel Sound notification when screen is unlocked</string>
 
 </resources>

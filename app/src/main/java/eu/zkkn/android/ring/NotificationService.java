@@ -38,7 +38,7 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
         MyLog.l(getClass().getName() + ".onStart()");
         MyLog.l(intent);
         mWakefullIntent = intent;
-        // TODO: try canceling alarm on "android.intent.action.USER_PRESENT"
+
         if (hasNewMissedCalls() || hasNewSmsMms()) {
             MyLog.setContext(this);
             MyLog.l("Beeeep!!!");
@@ -63,6 +63,9 @@ public class NotificationService extends Service implements MediaPlayer.OnPrepar
     }
 
     private boolean hasNewMissedCalls() {
+        // There's a bug in Lollipop, which count dismissed calls as missed, but doesn't show any
+        // notification for them, so we'll play beep sound and user won't see any notification
+        // https://code.google.com/p/android/issues/detail?id=81262
         String[] projection = {CallLog.Calls._ID};
         Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection,
                 CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE,
