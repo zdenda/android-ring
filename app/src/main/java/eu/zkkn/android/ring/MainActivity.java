@@ -13,16 +13,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.Telephony;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -133,14 +135,19 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     String[] projection = {CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
-                    String[] columns = {CallLog.Calls.NUMBER, CallLog.Calls.DATE};
-                    int[] listItems = {android.R.id.text1, android.R.id.text2};
                     Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, projection,
                             CallLog.Calls.NEW + " = 1 AND " + CallLog.Calls.TYPE + " = " + CallLog.Calls.MISSED_TYPE, null, null);
                     MyLog.l(cursor.getCount() + " missed call(s)");
-                    SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
-                            android.R.layout.simple_list_item_2, cursor, columns, listItems, 0);
-                    ((ListView) findViewById(R.id.listView)).setAdapter(adapter);
+                    LinearLayout layout = (LinearLayout) findViewById(R.id.layoutCalls);
+                    layout.removeAllViews();
+                    while (cursor.moveToNext()) {
+                        String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
+                        Date date = new Date(cursor.getLong(cursor.getColumnIndex(CallLog.Calls.DATE)));
+                        TextView tv = new TextView(MainActivity.this);
+                        tv.setLines(1);
+                        tv.setText(number + " (" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date) + ")");
+                        layout.addView(tv);
+                    }
                 }
             });
 
