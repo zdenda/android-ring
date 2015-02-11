@@ -14,5 +14,7 @@
     <string name="refresh_button">Refresh</string>
     <string name="mms_textview">MMS:</string>
     <string name="cancel_sound_notification_checkbox_description">Automatically cancel Sound notification when screen is unlocked</string>
+    <string name="start_unlock_tracking_button">Start Screen Unlock tracking</string>
+    <string name="user_present_welcome_back_toast">Welcome back! I missed you!</string>
 
 </resources>

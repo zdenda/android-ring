@@ -60,6 +60,12 @@
                 android:checked="false"
                 android:text="@string/cancel_sound_notification_checkbox_description" />
 
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/start_unlock_tracking_button"
+                android:id="@+id/btStartUserPresent" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

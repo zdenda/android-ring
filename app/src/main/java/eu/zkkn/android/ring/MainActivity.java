@@ -117,6 +117,13 @@ public class MainActivity extends ActionBarActivity {
             refreshSmsCounts();
             refreshMmsCounts();
 
+            findViewById(R.id.btStartUserPresent).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DebugUserPresentReceiver.register(MainActivity.this);
+                }
+            });
+
             findViewById(R.id.btSmsRefresh).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
